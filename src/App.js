@@ -12,7 +12,7 @@ function App() {
   const {isLoggedIn}=useMyOwnContext()
   return (
     <div >
-      <ProgressBar/>
+      <ProgressBar height="5px" color='royalblue'/>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={isLoggedIn?<Home/>:<Signup />}/>
