@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { showBar,hideBar } from 'top-loading-progress-bar'
 
 export default function AddTask() {
     const Navi=useNavigate()
@@ -8,6 +9,7 @@ export default function AddTask() {
     const [data, setData] = useState()
     const createTask= async(e)=>{
         e.preventDefault()
+        showBar()
         await Axios.post("https://task-manager-backend-ten-xi.vercel.app/task/create", data,{ headers: { "Authorization": localStorage.getItem("token") } }).then(res => {
             alert(res.data.msg)
             Navi("/")
@@ -24,6 +26,7 @@ export default function AddTask() {
                     break;
             }
         })
+        hideBar()
     }
     const onChangeHandler = (e) => {
         setData({ ...data, [e.target.name]: e.target.value })

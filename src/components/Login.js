@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useMyOwnContext } from '../context/Context';
+import { showBar, hideBar } from 'top-loading-progress-bar';
 
 export default function Login() {
     const { setLoggedIn } = useMyOwnContext()
@@ -13,6 +14,7 @@ export default function Login() {
     };
     const loginLoad = async (e) => {
         e.preventDefault()
+        showBar()
         if (isValidPassword(data.password)) {
             await Axios.post("https://task-manager-backend-ten-xi.vercel.app/auth/userlogin", data).then(res => {
                 if (res.data.success) {
@@ -37,7 +39,7 @@ export default function Login() {
             })
         } else
             alert("password not as per specifications")
-
+        hideBar()
     }
     const onChangeHandler = (e) => {
         setData({ ...data, [e.target.name]: e.target.value })

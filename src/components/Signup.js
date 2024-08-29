@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Axios from 'axios'
+import { showBar, hideBar } from 'top-loading-progress-bar'
 
 export default function Signup() {
     const [data, setData] = useState()
@@ -10,6 +11,7 @@ export default function Signup() {
     };
     const signupLoad = async (e) => {
         e.preventDefault()
+        showBar()
         if (isValidPassword(data.password)) {
             await Axios.post("https://task-manager-backend-ten-xi.vercel.app/auth/usersignup", data).then(res => {
                 if (res.data.success) {
@@ -33,7 +35,7 @@ export default function Signup() {
             })
         } else
             alert("password not as per specifications")
-
+        hideBar()
     }
     const onChangeHandler = (e) => {
         setData({ ...data, [e.target.name]: e.target.value })
