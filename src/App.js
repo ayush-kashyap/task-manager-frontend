@@ -1,23 +1,24 @@
-import logo from './logo.svg';
 import './App.css';
+import Signup from './components/Signup';
+import Login from './components/Login';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { useMyOwnContext } from './context/Context';
+import Home from './components/Home';
+import AddTask from './components/AddTask';
+import UpdateTask from './components/updateTask';
 
 function App() {
+  const {isLoggedIn}=useMyOwnContext()
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div >
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={isLoggedIn?<Home/>:<Signup />}/>
+          <Route path='/login' element={isLoggedIn?null:<Login />}/>
+          <Route path='/add-new' element={isLoggedIn?<AddTask />:null}/>
+          <Route path='/update/:id' element={isLoggedIn?<UpdateTask />:null}/>
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
