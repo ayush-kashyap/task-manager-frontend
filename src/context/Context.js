@@ -7,19 +7,7 @@ export const UserDetails=({children})=>{
     const [isLoggedIn, setLoggedIn] = useState(localStorage.getItem('token'))
     const [user, setUser] = useState()
 
-    const getTask = async () => {
-        var response = localStorage.getItem("token") ? true : false;
-        if (response) {
-            await Axios.get("https://task-manager-backend-ten-xi.vercel.app/task/read",  { headers: { "Authorization": localStorage.getItem("token") } }).then(
-                (res) => {
-                    response = res.data
-                }
-            ).catch((err) => {
-                response = false
-            })
-        }
-        return response
-    };
+
     const getUser = async () => {
         var response = localStorage.getItem("token") ? true : false;
         if (response) {
@@ -39,7 +27,7 @@ export const UserDetails=({children})=>{
     }
 
     return(
-    <UserContext.Provider value={{getTask,handleLogout,isLoggedIn, setLoggedIn,getUser,user, setUser}}>
+    <UserContext.Provider value={{handleLogout,isLoggedIn, setLoggedIn,getUser,user, setUser}}>
         {children}
     </UserContext.Provider>
     )
