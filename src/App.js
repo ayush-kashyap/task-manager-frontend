@@ -6,13 +6,11 @@ import { useMyOwnContext } from './context/Context';
 import Home from './components/Home';
 import AddTask from './components/AddTask';
 import UpdateTask from './components/updateTask';
-import { ProgressBar } from 'top-loading-progress-bar';
 
 function App() {
   const {isLoggedIn}=useMyOwnContext()
   return (
     <div >
-      <ProgressBar height="5px" color='royalblue'/>
       <BrowserRouter>
         <Routes>
           <Route path='/' element={isLoggedIn?<Home/>:<Signup />}/>

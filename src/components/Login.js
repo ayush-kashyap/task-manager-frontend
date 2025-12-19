@@ -3,9 +3,12 @@ import Axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useMyOwnContext } from '../context/Context';
 import { showBar, hideBar } from 'top-loading-progress-bar';
+import { message, Spin } from 'antd';
+import { postAPI } from '../utils/apiRequest';
 
 export default function Login() {
     const { setLoggedIn } = useMyOwnContext()
+    const [isLoading, setIsLoading] = useState(false)
     const Navi = useNavigate()
     const [data, setData] = useState()
     const isValidPassword = (password) => {
@@ -14,45 +17,54 @@ export default function Login() {
     };
     const loginLoad = async (e) => {
         e.preventDefault()
-        showBar()
+        
         if (isValidPassword(data.password)) {
-            await Axios.post("https://task-manager-backend-ten-xi.vercel.app/auth/userlogin", data).then(res => {
-                if (res.data.success) {
-                    localStorage.setItem("token", res.data.token)
-                    setLoggedIn(res.data.token);
-                    alert(res.data.msg)
+            setIsLoading(true);
+            
+
+            const successFn=(res)=>{
+                if (res.success) {
+                    localStorage.setItem("token", res.token)
+                    setLoggedIn(res.token);
+                    message.success(res.msg)
                     Navi('/')
-                } else
-                    alert("Some error occurred")
-            }).catch(err => {
+                } 
+                
+            }
+            const errorFn=(err)=>{
                 switch (err.status) {
                     case 401:
-                        alert("Wrong Password")
+                        message.error("Wrong Password")
                         break;
                     case 404:
-                        alert("User not found")
+                        message.error("User not found")
                         break;
                     default:
-                        alert("Unknown error ")
+                        message.error("Unknown error ")
                         break;
                 }
-            })
+                setIsLoading(false);
+            }
+
+            postAPI("auth/userlogin",data,successFn,errorFn)
+            
         } else
-            alert("password not as per specifications")
-        hideBar()
+            message.error("Password not as per specifications")
+            
     }
     const onChangeHandler = (e) => {
         setData({ ...data, [e.target.name]: e.target.value })
     }
     return (
         <div className="h-screen flex flex-col justify-center">
-
+            <Spin spinning={isLoading}>
             <form onSubmit={loginLoad} className='flex flex-col items-center'>
                 <h2 className='text-center font-bold text-3xl'>Login to task Manager</h2>
                 <input onChange={onChangeHandler} required className='w-3/4 sm:w-2/4 my-2 py-2 px-4 border-b-2 border-blue-600 focus:outline-none' placeholder='Enter your email' type="email" name="email" id="email" />
                 <input onChange={onChangeHandler} required className='w-3/4 sm:w-2/4 my-2 py-2 px-4 border-b-2 border-blue-600 focus:outline-none' placeholder='Enter you password' type="password" name="password" id="password" />
                 <input className="w-3/4 sm:w-2/4 my-2 rounded-md cursor-pointer text-white bg-blue-600 py-2" type="submit" value="Login" />
             </form>
+            </Spin>
         </div>
     )
 }

@@ -1,49 +1,63 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, } from 'react'
+import { Link ,useNavigate} from 'react-router-dom'
 import Axios from 'axios'
-import { showBar, hideBar } from 'top-loading-progress-bar'
+import { message, Spin } from 'antd'
+import { postAPI } from '../utils/apiRequest'
 
 export default function Signup() {
+    const Navi = useNavigate()
     const [data, setData] = useState()
+    const [isLoading, setIsLoading] = useState(false)
     const isValidPassword = (password) => {
         const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         return regex.test(password);
     };
     const signupLoad = async (e) => {
         e.preventDefault()
-        showBar()
+        
         if (isValidPassword(data.password)) {
-            await Axios.post("https://task-manager-backend-ten-xi.vercel.app/auth/usersignup", data).then(res => {
-                if (res.data.success) {
-                    alert(res.data.msg)
+            setIsLoading(true);
+            
+            
+            const successFn=(res)=>{
+                console.log(res);
+                if (res.success) {
+                    message.success(res.msg||"User Created Successfully")
+                    Navi("/login");
                 }
-            }).catch(err => {
+                setIsLoading(false);
+            }
+            const errorFn=(err)=>{
+                console.log(err);
                 switch (err.status) {
                     case 409:
-                        alert("User Already Exists")
+                        message.error("User Already Exists")
                         break;
                     case 404:
-                        alert("Missing data")
+                        message.error("Missing data")
                         break;
                     case 500:
-                        alert("Internal server error")
+                        message.error("Internal server error")
                         break;
                     default:
-                        alert("Unknown error ")
+                        message.error("Unknown error ")
                         break;
                 }
-            })
+                setIsLoading(false);
+            }
+
+            postAPI("auth/usersignup",data,successFn,errorFn)
         } else
-            alert("password not as per specifications")
-        hideBar()
+            alert("Password not as per specifications")
+            
     }
     const onChangeHandler = (e) => {
         setData({ ...data, [e.target.name]: e.target.value })
     }
     return (
-        <div className="h-screen flex flex-col justify-center">
+        <div  className="h-screen flex flex-col justify-center">
 
-            <form onSubmit={signupLoad} className='flex flex-col items-center'>
+            <Spin spinning={isLoading}><form onSubmit={signupLoad} className='flex flex-col items-center'>
                 <h2 className='text-center font-bold text-3xl'>Signup to task Manager</h2>
                 <input onChange={onChangeHandler} required className=' w-3/4 sm:w-2/4 my-2 py-2 px-4 border-b-2 border-blue-600 focus:outline-none' placeholder='Enter your name' type="text" name="name" id="name" />
                 <input onChange={onChangeHandler} required className=' w-3/4 sm:w-2/4 my-2 py-2 px-4 border-b-2 border-blue-600 focus:outline-none' placeholder='Enter your email' type="email" name="email" id="email" />
@@ -52,6 +66,7 @@ export default function Signup() {
                 <input className=" w-3/4 sm:w-2/4 my-2 rounded-md cursor-pointer text-white bg-blue-600 py-2" type="submit" value="Signup" />
                 <p>Already have an account? <Link className='text-blue-600 font-semibold' to='/login'>Login</Link></p>
             </form>
+            </Spin>
         </div>
     )
 }
