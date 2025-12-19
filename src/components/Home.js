@@ -14,6 +14,7 @@ export default function Home() {
     const [messageAPI,contextHolder]=message.useMessage();
     const { getUser, handleLogout, setUser, user } = useMyOwnContext()
     const [loading, setloading] = useState(true)
+    const [deleteLoading, setDeleteLoading] = useState(false)
     const [value, setValue] = useState('')
     const [modalLoading, setModalLoading] = useState(false)
     const [taskEditLoader, setTaskEditLoader] = useState(false)
@@ -92,14 +93,16 @@ export default function Home() {
         getAPI("task/read",apiParams,successFn,errorFn);
     }
     const deleteTask = async (e) => {
-        await Axios.delete(`https://task-manager-backend-ten-xi.vercel.app/task/delete/${e.target.value}`, { headers: { "Authorization": localStorage.getItem("token") } }).then(res => {
+        setDeleteLoading(true);
+        await Axios.delete(`https://task-manager-backend-ten-xi.vercel.app/task/delete/${e._id.toString()}`, { headers: { "Authorization": localStorage.getItem("token") } }).then(res => {
             if (res.status === 204) {
-                alert("Deleted!")
-                setCount(count + 1)
+                message.success("Deleted!")
+                getTasks();
             }
         }).catch(err => {
-            alert('error')
+            message.error('Error deleting')
         })
+        setDeleteLoading(false);
     }
     return (
         <div className='h-screen'>
@@ -129,7 +132,7 @@ export default function Home() {
                                                 
                                             <Card
                                             key={item.id}
-                                            title={<Row align={"middle"} justify={"space-between"}> <h3 className='text-xl font-bold my-2'>Task {i+1}</h3> <Button danger onClick={deleteTask} >Delete <DeleteOutlined/></Button></Row>}
+                                            title={<Row align={"middle"} justify={"space-between"}> <h3 className='text-xl font-bold my-2'>Task {i+1}</h3> <Button danger onClick={()=>deleteTask(item)} loading={deleteLoading}>Delete <DeleteOutlined/></Button></Row>}
                                             >
                                                 
                                                 <Row ><Col md={8} xs={24}><b>Title :</b></Col><Col md={16} xs={24}>{item.title}</Col></Row>
